@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Temperature Converter</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 500px;
+            width: 100%;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 24px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        
+        .header h1 {
+            color: #555;
+            font-size: 24px;
+            margin: 0;
+        }
+        
+        .header p {
+            color: #888;
+            margin-top: 8px;
+        }
+        
+        .input-group {
+            margin-bottom: 24px;
+        }
+        
+        .input-group label {
+            display: block;
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 4px;
+        }
+        
+        .input-wrapper {
+            position: relative;
+        }
+        
+        .input-wrapper input {
+            width: 100%;
+            padding: 12px 36px 12px 12px;
+            font-size: 18px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            box-sizing: border-box;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        
+        .input-wrapper input:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+        
+        .unit-indicator {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #888;
+            font-size: 18px;
+        }
+        
+        .error-message {
+            color: #e11d48;
+            font-size: 14px;
+            margin-top: 4px;
+            display: none;
+        }
+        
+        .unit-toggle {
+            display: flex;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+        
+        .unit-toggle button {
+            flex: 1;
+            padding: 12px;
+            font-size: 16px;
+            font-weight: 500;
+            border: none;
+            background-color: white;
+            color: #888;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .unit-toggle button.active {
+            background-color: #2563eb;
+            color: white;
+        }
+        
+        .unit-toggle button:hover:not(.active) {
+            background-color: #f5f5f5;
+        }
+        
+        .conversion-result {
+            background-color: #f5f5f5;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+        
+        .conversion-result p {
+            color: #888;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+        
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .result-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .result-unit {
+            font-size: 14px;
+            color: #555;
+            text-transform: capitalize;
+        }
+        
+        .result-value {
+            display: flex;
+            align-items: flex-end;
+        }
+        
+        .result-value .number {
+            font-size: 20px;
+            font-weight: 500;
+            color: #555;
+        }
+        
+        .result-value .unit {
+            font-size: 16px;
+            color: #888;
+            margin-left: 4px;
+        }
+        
+        .result-icon {
+            width: 40px;
+            height: 40px;
+            background-color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            color: #2563eb;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        
+        .action-buttons button {
+            flex: 1;
+            padding: 12px;
+            font-size: 16px;
+            font-weight: 500;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .action-buttons button:active {
+            transform: translateY(1px);
+        }
+        
+        .convert-btn {
+            background-color: #2563eb;
+            color: white;
+        }
+        
+        .convert-btn:hover {
+            background-color: #1d4ed8;
+        }
+        
+        .clear-btn {
+            background-color: #f5f5f5;
+            color: #555;
+        }
+        
+        .clear-btn:hover {
+            background-color: #e0e0e0;
+        }
+        
+        .temperature-info {
+            border-top: 1px solid #e0e0e0;
+            padding-top: 16px;
+        }
+        
+        .accordion {
+            cursor: pointer;
+            color: #2563eb;
+            font-weight: 500;
+            background: none;
+            border: none;
+            text-align: left;
+            padding: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .accordion:after {
+            content: '+';
+            font-size: 18px;
+            color: #2563eb;
+        }
+        
+        .active:after {
+            content: '-';
+        }
+        
+        .panel {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        
+        .panel-content {
+            padding: 16px 0;
+            color: #888;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        .panel-content p {
+            margin: 8px 0;
+        }
+        
+        .panel-content .note {
+            font-size: 12px;
+            color: #aaa;
+            margin-top: 16px;
+        }
+        
+        .font-medium {
+            font-weight: 500;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="header">
+                <h1>Temperature Converter</h1>
+                <p>Convert between Celsius, Fahrenheit, and Kelvin with ease</p>
+            </div>
+            
+            <div class="input-group">
+                <label for="temperature">Enter Temperature</label>
+                <div class="input-wrapper">
+                    <input type="number" id="temperature" placeholder="0">
+                    <span class="unit-indicator" id="unit-indicator">°C</span>
+                </div>
+                <div class="error-message" id="error-message"></div>
+            </div>
+            
+            <div class="unit-toggle">
+                <button class="active" data-unit="celsius">Celsius</button>
+                <button data-unit="fahrenheit">Fahrenheit</button>
+                <button data-unit="kelvin">Kelvin</button>
+            </div>
+            
+            <div class="conversion-result" id="conversion-result">
+                <p>Converted Temperature</p>
+                <div id="results-container"></div>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="clear-btn" id="clear-btn">Clear</button>
+                <button class="convert-btn" id="convert-btn">Convert</button>
+            </div>
+            
+            <div class="temperature-info">
+                <button class="accordion">Temperature Information</button>
+                <div class="panel">
+                    <div class="panel-content">
+                        <p>• <span class="font-medium">Absolute Zero:</span> -273.15°C / -459.67°F / 0K</p>
+                        <p>• <span class="font-medium">Freezing Point of Water:</span> 0°C / 32°F / 273.15K</p>
+                        <p>• <span class="font-medium">Boiling Point of Water:</span> 100°C / 212°F / 373.15K</p>
+                        <p>• <span class="font-medium">Room Temperature:</span> ~20-25°C / ~68-77°F / ~293-298K</p>
+                        <p class="note">Note: Kelvin (K) is an absolute temperature scale with no negative values, starting at absolute zero (0K).</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get elements
+            const temperatureInput = document.getElementById('temperature');
+            const unitToggleButtons = document.querySelectorAll('.unit-toggle button');
+            const unitIndicator = document.getElementById('unit-indicator');
+            const errorMessage = document.getElementById('error-message');
+            const clearBtn = document.getElementById('clear-btn');
+            const convertBtn = document.getElementById('convert-btn');
+            const resultsContainer = document.getElementById('results-container');
+            
+            // Unit symbols
+            const unitSymbols = {
+                'celsius': '°C',
+                'fahrenheit': '°F',
+                'kelvin': 'K'
+            };
+            
+            // Current unit
+            let currentUnit = 'celsius';
+            
+            // Set unit indicator
+            function updateUnitIndicator() {
+                unitIndicator.textContent = unitSymbols[currentUnit];
+            }
+            
+            // Handle unit toggle
+            unitToggleButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Remove active class from all buttons
+                    unitToggleButtons.forEach(btn => btn.classList.remove('active'));
+                    
+                    // Add active class to clicked button
+                    this.classList.add('active');
+                    
+                    // Set current unit
+                    currentUnit = this.dataset.unit;
+                    
+                    // Update unit indicator
+                    updateUnitIndicator();
+                    
+                    // Clear error
+                    errorMessage.style.display = 'none';
+                    
+                    // If there is a value in the input, validate it
+                    if (temperatureInput.value) {
+                        validateTemperature(parseFloat(temperatureInput.value));
+                    }
+                });
+            });
+            
+            // Validate temperature
+            function validateTemperature(value) {
+                errorMessage.style.display = 'none';
+                
+                if (isNaN(value)) {
+                    errorMessage.textContent = 'Please enter a valid temperature';
+                    errorMessage.style.display = 'block';
+                    return false;
+                }
+                
+                switch (currentUnit) {
+                    case 'celsius':
+                        if (value < -273.15) {
+                            errorMessage.textContent = 'Temperature below absolute zero (-273.15°C)';
+                            errorMessage.style.display = 'block';
+                            return false;
+                        }
+                        break;
+                    case 'fahrenheit':
+                        if (value < -459.67) {
+                            errorMessage.textContent = 'Temperature below absolute zero (-459.67°F)';
+                            errorMessage.style.display = 'block';
+                            return false;
+                        }
+                        break;
+                    case 'kelvin':
+                        if (value < 0) {
+                            errorMessage.textContent = 'Temperature below absolute zero (0K)';
+                            errorMessage.style.display = 'block';
+                            return false;
+                        }
+                        break;
+                }
+                
+                return true;
+            }
+            
+            // Handle clear button
+            clearBtn.addEventListener('click', function() {
+                temperatureInput.value = '';
+                errorMessage.style.display = 'none';
+                resultsContainer.innerHTML = '';
+            });
+            
+            // Handle convert button
+            convertBtn.addEventListener('click', function() {
+                const temperature = temperatureInput.value;
+                
+                // Validate input
+                if (!temperature) {
+                    errorMessage.textContent = 'Please enter a temperature';
+                    errorMessage.style.display = 'block';
+                    return;
+                }
+                
+                const value = parseFloat(temperature);
+                if (!validateTemperature(value)) {
+                    return;
+                }
+                
+                // Call API to convert temperature
+                fetch('/convert', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        temperature: temperature,
+                        from_unit: currentUnit
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        errorMessage.textContent = data.error;
+                        errorMessage.style.display = 'block';
+                        return;
+                    }
+                    
+                    // Display results
+                    displayResults(data.converted);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    errorMessage.textContent = 'An error occurred. Please try again.';
+                    errorMessage.style.display = 'block';
+                });
+            });
+            
+            // Display conversion results
+            function displayResults(results) {
+                resultsContainer.innerHTML = '';
+                
+                // Get target units (all except current unit)
+                const allUnits = ['celsius', 'fahrenheit', 'kelvin'];
+                const targetUnits = allUnits.filter(unit => unit !== currentUnit);
+                
+                // Create result items
+                targetUnits.forEach(unit => {
+                    const resultItem = document.createElement('div');
+                    resultItem.className = 'result-item';
+                    
+                    const unitValue = results[unit];
+                    
+                    resultItem.innerHTML = `
+                        <div>
+                            <p class="result-unit">${unit}</p>
+                            <div class="result-value">
+                                <span class="number">${unitValue.toFixed(2)}</span>
+                                <span class="unit">${unitSymbols[unit]}</span>
+                            </div>
+                        </div>
+                        <div class="result-icon">→</div>
+                    `;
+                    
+                    resultsContainer.appendChild(resultItem);
+                });
+            }
+            
+            // Accordion
+            const accordion = document.querySelector('.accordion');
+            accordion.addEventListener('click', function() {
+                this.classList.toggle('active');
+                const panel = this.nextElementSibling;
+                if (panel.style.maxHeight) {
+                    panel.style.maxHeight = null;
+                } else {
+                    panel.style.maxHeight = panel.scrollHeight + 'px';
+                }
+            });
+            
+            // Handle input changes
+            temperatureInput.addEventListener('input', function() {
+                if (this.value) {
+                    validateTemperature(parseFloat(this.value));
+                } else {
+                    errorMessage.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
